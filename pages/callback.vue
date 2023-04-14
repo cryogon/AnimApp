@@ -1,16 +1,18 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
-const code = useRouter().currentRoute.value.query.code;
+const route = useRoute();
+const { code } = route.params;
 function getItem() {
   return localStorage.getItem("codeV");
 }
 
 if (process.client) {
   try {
-    const token = await useFetch("https://myanimelist.net/v1/oauth2/token", {
+    const token = await fetch("https://myanimelist.net/v1/oauth2/token", {
       method: "POST",
-      mode: "no-cors",
+
       headers: {
+        "Access-Control-Allow-Origin":"http://localhost:3000",
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: JSON.stringify({
