@@ -1,35 +1,22 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
-const route = useRoute();
-const { code } = route.params;
-function getItem() {
-  return localStorage.getItem("codeV");
-}
-
-if (process.client) {
-  try {
-    const token = await fetch("https://myanimelist.net/v1/oauth2/token", {
-      method: "POST",
-
-      headers: {
-        "Access-Control-Allow-Origin":"http://localhost:3000",
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: JSON.stringify({
-        client_id: config.public.malClientId,
-        client_secret: config.public.malClientSecret,
-        grant_type: "authorization_code",
-        code,
-        code_verifier: getItem(),
-      }),
-    });
-
-    console.log(token);
-  } catch (err) {
-    console.error(err);
-  }
+const router = useRouter();
+const { code } = router.currentRoute.value.query;
+const {data,refresh} = await useFetch("/api/auth/**",{
+  method:"POST",
+  body:({code})
+});
+const auth = useState("auth");
+if(data.value?.access_token){
+  const issue_time = Date.now();
+  auth.value = {issue_time,...data.value}
+  console.log(auth.value);
+  router.push("/");
 }
 </script>
 <template>
-  <div>Hmm</div>
+  <main>
+    <div>{{ data }}</div>
+    <button @click="refresh()">Refetch</button>
+  </main>
 </template>

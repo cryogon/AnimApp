@@ -1,74 +1,45 @@
 <script setup lang="ts">
+import axios from 'axios';
+
 const config = useRuntimeConfig();
-
-interface SeasonalAnimeOptions {
-  /**
-   * @default "0"
-   */
-  offset?: string;
-  /**
-   * @default "100"
-   * max 500
-   */
-  limit?: string;
-  /**
-   * @default 2023
-   */
-  year: number;
-  /**
-   * @default "winter"
-   */
-  season: "winter" | "sprint" | "summer" | "fall";
-}
-async function getSeasonalAnime(options?: SeasonalAnimeOptions) {
-  const {
-    season = "winter",
-    year = 2023,
-    offset = "0",
-    limit = "100",
-  } = options || {};
-  const params = new URLSearchParams();
-  params.set("offset", offset);
-  params.set("limit", limit);
-
-  const url = `https://api.myanimelist.net/v2/anime/season/${year}/${season}?${params}`;
-  try {
-    const animes = await useAsyncData<any>("ani", () =>
-      $fetch(url, {
-        mode: "no-cors",
-        headers: {
-          "X-MAL-CLIENT-ID": config.public.malClientId,
-        },
-      })
-    );
-    return animes.data.value.data;
-  } catch {
-    return { msg: "Error" };
+const authorized = ref(false);
+const auth = useState("auth");
+const query = ref(`
+query{
+  Page(page:1){
+    media{
+      title{
+        english
+        native
+      }
+    }
   }
-}
-const animes = await getSeasonalAnime();
+}`)
+const accessToken = ref();
+// const anime = await axios.post('https://graphql.anilist.co',{
+//   query:query
+// },{
+//   headers:{
+//     'Authorization': 'Bearer ' + accessToken,
+//     'Content-Type': 'application/json',
+//     'Accept': 'application/json'
+//   }
+// })
+onMounted(()=>{
+  if(auth.value){
+    authorized.value = true;
+    console.log(auth.value);
+    accessToken.value = auth.value;
+  }
+})
 </script>
 
 <template>
   <main>
-    <LoginButton />
     <section class="seasonal_anime">
-      <h2>Seasonal Anime</h2>
-      <div class="flex flex-wrap justify-between pe-5 ps-5 gap-1">
-        <div
-          class="anime__item flex "
-          v-for="anime in animes"
-          :key="anime.node"
-        >
-          <NuxtLink :to="`/anime/${anime.node.id}`" class="flex flex-col">
-            <img
-              :src="anime.node.main_picture.large"
-              :alt="anime.node.title"
-              class="w30"
-            />
-            <span class="w30">{{ anime.node.title }}</span>
-          </NuxtLink>
-        </div>
+      <AnilistLogin v-if="!authorized"/>
+      <div v-else>
+        <!-- {{ anime }} -->
       </div>
     </section>
   </main>

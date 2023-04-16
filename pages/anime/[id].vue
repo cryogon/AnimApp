@@ -17,7 +17,8 @@ const anime = await useFetch(
 </script>
 
 <template>
-  <div>
-    {{ Object.keys(anime.data.value as Object) }}
+  <div v-for="(anim,index) in anime.data.value" :key="index">
+    <br/>
+   {{ Object.keys(anime.data.value as Object)[index] }} {{ index }} : {{ anim}}
   </div>
 </template>
