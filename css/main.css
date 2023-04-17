@@ -4,10 +4,15 @@
     box-sizing: border-box;
 }
 :root{
-    --background-primary:#161616;
+    --background-primary:#081C15;
+    --background-secondary:#1B4332;
+    --highlight-color:#40916C;
+    --icon-color:#74C69D;
+
     --text-color:azure;
 }
 body{
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background-color: var(--background-primary);
     color:var(--text-color);
 }

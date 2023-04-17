@@ -9,7 +9,8 @@ export default defineNuxtConfig({
         }
     },
     modules: [
-        // 'nuxt-electron'
+        // 'nuxt-electron',
+        'nuxt-icon'
     ],
     // electron: {
     //     include: ['electron'],

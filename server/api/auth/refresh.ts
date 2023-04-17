@@ -11,15 +11,13 @@ export default defineEventHandler(async e => {
             'Accept': 'application/json',
         },
         json: {
-            'grant_type': 'authorization_code',
+            'grant_type': 'refresh_token',
             'client_id': config.public.aniListClientId,
             'client_secret': config.aniListClientSecret,
-            'redirect_uri': 'http://localhost:3000/callback', // http://example.com/callback
-            'code': body.code, // The Authorization Code received previously
+            'refresh_token': body.code, // The Authorization Code received previously
         }
     };
     const req = util.promisify(request);
-
     const data = await req(options)
         .then(res => {
             return res;

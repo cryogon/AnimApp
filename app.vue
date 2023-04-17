@@ -1,5 +1,7 @@
 <template>
   <div class="bg-black">
-    <RouterView/>
+    <NuxtLayout>
+      <NuxtPage/>
+    </NuxtLayout>
   </div>
 </template>
