@@ -1,8 +1,12 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
-const url = new URL(`https://anilist.co/api/v2/oauth/authorize?client_id=${config.public.aniListClientId}&redirect_uri=http://localhost:3000/callback&response_type=code`)
+const { authorized, loginWithAniList } = useAuth({
+  clientId: config.public.aniListClientId,
+  redirectUri: useRoute().fullPath,
+});
+
 </script>
 
 <template>
-    <a :href="url.href">Login with AniList</a>
+   <button type="button" class="anilist" v-if="authorized" @click="loginWithAniList">Login With Anilist</button>
 </template>

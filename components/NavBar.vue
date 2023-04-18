@@ -2,7 +2,7 @@
 <template>
     <nav class="navigation-bar">
         <Icon name="mdi:home" size="35"/>
-        <Icon name="mdi:magnify" size="35"/>
+        <Icon name="mdi:magnify" size="35" @click="useRouter().push('/search/')"/>
         <Icon name="mdi:cog" size="35"/>
     </nav>
 </template>
