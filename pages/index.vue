@@ -2,8 +2,7 @@
 
 <template>
   <main>
-    <MalLogin/>
-    <!-- <AnilistLogin /> -->
+    <AnilistLogin /> 
   </main>
 </template>
 

@@ -13,17 +13,17 @@ export interface AuthResponse {
 }
 export function useAuth() {
     const clientId = ref<string | number>(process.client && localStorage.getItem("clientId") || "");
-    // const clientSecret = ref(options.clientSecret);
     const redirectUri = ref(process.client && localStorage.getItem("redirectUri") || "");
     const code = ref<string | null>();
     const tokenInfo = ref<AuthResponse>();
     const authorized = ref(process.client && localStorage.getItem("isAuth") ? true : false);
     const auth_provider = ref<"MAL" | "ANILIST">("ANILIST");
     const code_verifier = ref(process.client && localStorage.getItem("PKCE_V") || "");
+    const loggedInProvider = new Array<"MAL" | "ANILIST">(2);
 
     function loginWithAniList(options: AuthOptions) {
-        clientId.value ||= options.clientId;
-        redirectUri.value ||= options.redirectUri;
+        clientId.value = options.clientId;
+        redirectUri.value = options.redirectUri;
         process.client && localStorage.setItem("clientId", clientId.value.toString());
         process.client && localStorage.setItem("redirectUri", options.redirectUri);
         location.assign(`https://anilist.co/api/v2/oauth/authorize?client_id=${clientId.value}&redirect_uri=${redirectUri.value}&response_type=code`)
@@ -74,6 +74,9 @@ export function useAuth() {
             window.history.pushState("home", "", window.location.origin);
             authorized.value = true;
 
+            if (!loggedInProvider.includes(auth_provider.value)) {
+                loggedInProvider.push(auth_provider.value);
+            }
             //Clearing Client Info so it can be replced with other client
             //Nitro Server Gives error since it cannot find localStorage in node environment
             //So need to check if it is being used by client not server;
@@ -86,9 +89,11 @@ export function useAuth() {
         }
         watchEffect(async () => {
             if (tokenInfo.value && (tokenInfo.value?.expires_in + tokenInfo.value?.issued_in) < Date.now()) {
-                const token = await useFetch("/api/auth/refresh", { method: "POST", body: { code: tokenInfo.value.refresh_token } })
-                const newData = { ...(token.data.value as Object), issued_in: Date.now() } as AuthResponse;
-                tokenInfo.value = newData;
+                for (let provider of loggedInProvider) {
+                    const token = await useFetch("/api/auth/refresh", { method: "POST", body: { code: tokenInfo.value.refresh_token, provider } })
+                    const newData = { ...(token.data.value as Object), issued_in: Date.now() } as AuthResponse;
+                    tokenInfo.value = newData;
+                }
             }
         })
     })

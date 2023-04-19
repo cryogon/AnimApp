@@ -10,7 +10,8 @@ export default defineNuxtConfig({
     },
     modules: [
         // 'nuxt-electron',
-        'nuxt-icon'
+        'nuxt-icon',
+        '@nuxtjs/eslint-module'
     ],
     // electron: {
     //     include: ['electron'],
@@ -19,4 +20,5 @@ export default defineNuxtConfig({
     css: [
         "~/css/main.css"
     ],
+    eslint:{}
 })
