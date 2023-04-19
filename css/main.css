@@ -8,7 +8,7 @@
   --background-secondary: #1b4332;
   --highlight-color: #40916c;
   --icon-color: #74c69d;
-  --text-color: #FFFFFF;
+  --text-color: #ffffff;
 }
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -23,15 +23,16 @@ input {
   border-radius: 1rem;
   color: var(--text-color);
 }
-input:focus,button:focus {
+input:focus,
+button:focus {
   border: 1px solid var(--text-color);
 }
-button{
-    all:unset;
-    background-color: var(--icon-color);
-    font-family: inherit;
-    border-radius: 0.5rem;
-    padding:0.5rem;
-    cursor: pointer;
-    color:var(--text-color);
+button {
+  all: unset;
+  background-color: var(--icon-color);
+  font-family: inherit;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--text-color);
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const config = useRuntimeConfig();
+// const config = useRuntimeConfig();
 const seasonalAnimeQuery = ref(`
 query{
   Page(page:1,perPage:20){
@@ -85,14 +85,14 @@ onMounted(() => {
 <template>
   <main>
     <input
+      v-model="search"
       type="text"
       class="anime-search"
       placeholder="Search for anime"
       autocomplete="off"
       autosave="off"
-      v-model="search"
     />
-    <section class="seasonal_anime" v-if="seasonalAnime">
+    <section v-if="seasonalAnime" class="seasonal_anime">
       <h2>Seasonal Anime</h2>
       <div class="anime-section">
         <div v-for="anime in seasonalAnime" :key="anime.id" class="anime">
@@ -105,10 +105,15 @@ onMounted(() => {
         </div>
       </div>
     </section>
-    <section class="top_anime" v-if="topAnime">
+    <section v-if="topAnime" class="top_anime">
       <h2>Top Anime</h2>
       <div class="anime-section">
-        <div v-for="anime in topAnime" :key="anime.id" class="anime" @click="useRouter().push(`/anime/${anime.idMal}`)">
+        <div
+          v-for="anime in topAnime"
+          :key="anime.id"
+          class="anime"
+          @click="useRouter().push(`/anime/${anime.idMal}`)"
+        >
           <div
             class="anime-cover"
             :style="`--cover-img:url(${anime.coverImage.large})`"
