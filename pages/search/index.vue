@@ -158,7 +158,7 @@ main {
       width: 145px;
       height: 211.38px;
       display: flex;
-      align-items: end;
+      align-items: flex-end;
       .anime-title {
         width: 100%;
         word-break: break-all;

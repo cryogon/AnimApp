@@ -31,5 +31,7 @@ button{
     background-color: var(--icon-color);
     font-family: inherit;
     border-radius: 0.5rem;
+    padding:0.5rem;
+    cursor: pointer;
     color:var(--text-color);
 }
