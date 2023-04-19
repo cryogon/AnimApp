@@ -24,7 +24,12 @@ export function useAuth() {
       (process.client && localStorage.getItem("ani-code")) || `{}`
     ) satisfies AuthResponse
   );
-  const authorized = ref(!!(process.client && localStorage.getItem("isAuth")));
+  const isMalConnected = ref(
+    !!(process.client && localStorage.getItem("isAuthMAL"))
+  );
+  const isAniListConnected = ref(
+    !!(process.client && localStorage.getItem("isAuthAL"))
+  );
   const authProvider = ref<"MAL" | "ANILIST">("ANILIST");
   const codeVerifier = ref(
     (process.client && localStorage.getItem("PKCE_V")) || ""
@@ -78,27 +83,44 @@ export function useAuth() {
     }
     if (query.has("code")) {
       code.value = query.get("code");
+      try {
+        const res = await fetch("/api/auth/authorize", {
+          method: "POST",
+          body: JSON.stringify({
+            code: code.value,
+            provider: authProvider.value,
+            codeVerifier: codeVerifier.value,
+          }),
+        });
+        const data = await res.json();
+        const newData = {
+          ...((await data) as Object),
+          issued_in: Date.now(),
+        } as AuthResponse;
 
-      const res = await fetch("/api/auth/authorize", {
-        method: "POST",
-        body: JSON.stringify({
-          code: code.value,
-          provider: authProvider.value,
-          codeVerifier: codeVerifier.value,
-        }),
-      });
-      const data = await res.json();
-      const newData = {
-        ...((await data) as Object),
-        issued_in: Date.now(),
-      } as AuthResponse;
-      tokenInfo.value = newData;
-      localStorage.setItem("ani-token", JSON.stringify(tokenInfo.value));
-      window.history.pushState("home", "", window.location.origin);
-      authorized.value = true;
+        tokenInfo.value = newData;
+        localStorage.setItem("ani-token", JSON.stringify(tokenInfo.value));
+        window.history.pushState("home", "", window.location.origin);
 
-      if (!loggedInProvider.includes(authProvider.value)) {
-        loggedInProvider.push(authProvider.value);
+        if (authProvider.value === "MAL") {
+          isMalConnected.value = true;
+          localStorage.setItem("isAuthMAL", "true");
+        } else {
+          isAniListConnected.value = true;
+          localStorage.setItem("isAuthAL", "true");
+        }
+
+        if (!loggedInProvider.includes(authProvider.value)) {
+          loggedInProvider.push(authProvider.value);
+        }
+      } catch {
+        if (authProvider.value === "MAL") {
+          isMalConnected.value = false;
+          localStorage.removeItem("isAuthMAL");
+        } else {
+          isAniListConnected.value = false;
+          localStorage.removeItem("isAuthAL");
+        }
       }
       // Clearing Client Info so it can be replced with other client
       // Nitro Server Gives error since it cannot find localStorage in node environment
@@ -108,7 +130,8 @@ export function useAuth() {
       process.client && localStorage.removeItem("PKCE_V");
     }
     if (tokenInfo.value?.access_token) {
-      authorized.value = true;
+      if (localStorage.getItem("isAuthMAL")) isMalConnected.value = true;
+      if (localStorage.getItem("isAuthAL")) isAniListConnected.value = true;
     }
     watchEffect(async () => {
       if (
@@ -130,5 +153,11 @@ export function useAuth() {
     });
   });
 
-  return { token: tokenInfo, loginWithAniList, authorized, loginWithMAL };
+  return {
+    token: tokenInfo,
+    loginWithAniList,
+    isMalConnected,
+    isAniListConnected,
+    loginWithMAL,
+  };
 }

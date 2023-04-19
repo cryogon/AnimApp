@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
-const { loginWithMAL, authorized, token } = useAuth();
+const { loginWithMAL, isMalConnected, token } = useAuth();
 function login() {
   loginWithMAL({
     clientId: config.public.malClientId,
@@ -10,9 +10,7 @@ function login() {
 </script>
 <template>
   <div>
-    <button v-if="!authorized" type="button" @click="login">
-      Login With MyAnimeList
-    </button>
+    <button v-if="!isMalConnected" type="button" @click="login">Connect</button>
     <span>{{ token?.access_token }}</span>
   </div>
 </template>

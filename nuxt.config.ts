@@ -8,15 +8,11 @@ export default defineNuxtConfig({
       aniListClientId: process.env.NUXT_ANILIST_CLIENT_ID,
     },
   },
-  modules: [
-    // 'nuxt-electron',
-    "nuxt-icon",
-    "@nuxtjs/eslint-module",
-  ],
-  // electron: {
-  //     include: ['electron'],
-  //     outDir: 'dist-electron',
-  // },
+  modules: ["nuxt-electron", "nuxt-icon", "@nuxtjs/eslint-module"],
+  electron: {
+    include: ["electron"],
+    outDir: "dist-electron",
+  },
   css: ["~/css/main.css"],
   eslint: {},
 });

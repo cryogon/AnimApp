@@ -1,6 +1,8 @@
 <template>
   <nav class="navigation-bar">
-    <Icon name="mdi:home" size="35" />
+    <RouterLink to="/">
+      <Icon name="mdi:home" size="35" />
+    </RouterLink>
     <RouterLink to="/search/">
       <Icon name="mdi:magnify" size="35" />
     </RouterLink>

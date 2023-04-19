@@ -1,12 +1,12 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
-const { authorized, loginWithAniList, token } = useAuth();
+const { isAniListConnected, loginWithAniList, token } = useAuth();
 </script>
 
 <template>
   <div>
     <button
-      v-if="!authorized"
+      v-if="!isAniListConnected"
       type="button"
       class="anilist"
       @click="
@@ -16,7 +16,7 @@ const { authorized, loginWithAniList, token } = useAuth();
         })
       "
     >
-      Login With Anilist
+      Connect
     </button>
     <span v-else>{{ token }}</span>
   </div>

@@ -1,6 +1,7 @@
 {
   "name": "animapp",
   "private": true,
+  "main": "dist-electron/electron/main.js",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",

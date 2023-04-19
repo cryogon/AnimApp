@@ -34,5 +34,5 @@ button {
   border-radius: 0.5rem;
   padding: 0.5rem;
   cursor: pointer;
-  color: var(--text-color);
+  color: var(--background-secondary);
 }

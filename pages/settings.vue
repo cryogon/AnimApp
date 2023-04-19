@@ -1,8 +1,20 @@
 <template>
   <main>
     <section class="anime-providers">
-      <MalLogin />
-      <AnilistLogin />
+      <div class="provider">
+        <span class="icon">
+          <Icon name="simple-icons:myanimelist" size="35" />
+          <span>MyAnimeList</span>
+        </span>
+        <MalLogin />
+      </div>
+      <div class="provider">
+        <span class="icon">
+          <Icon name="simple-icons:anilist" size="35" />
+          <span>AniList</span>
+        </span>
+        <AnilistLogin />
+      </div>
     </section>
   </main>
 </template>
@@ -13,6 +25,15 @@ main {
     display: flex;
     gap: 10px;
     flex-direction: column;
+    .provider {
+      display: flex;
+      justify-content: space-between;
+      .icon {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+    }
   }
 }
 </style>
