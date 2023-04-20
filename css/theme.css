@@ -1,0 +1,23 @@
+html.forest-green{
+    --background-primary: #081c15;
+    --background-secondary: #1b4332;
+    --highlight-color: #40916c;
+    --icon-color: #74c69d;
+    --text-color: #ffffff;
+}
+
+html.theme-1{
+    --background-primary: #073B4C;
+    --background-secondary: #118AB2;
+    --highlight-color: #06D6A0;
+    --icon-color: #EF476F;
+    --text-color: #FFD166; 
+}
+
+html.theme-2{
+    --background-primary: #22223B;
+    --background-secondary: #4A4E69;
+    --highlight-color: #9A8C98;
+    --icon-color: #F2E9E4;
+    --text-color: #C9ADA7; 
+}

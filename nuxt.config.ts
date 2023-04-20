@@ -14,5 +14,4 @@ export default defineNuxtConfig({
     outDir: "dist-electron",
   },
   css: ["~/css/main.css"],
-  eslint: {},
 });
