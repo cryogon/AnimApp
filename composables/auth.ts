@@ -11,6 +11,10 @@ export interface AuthResponse {
   expires_in: number;
   token_type: string;
 }
+export interface TokenType {
+  MAL: AuthResponse | null;
+  ANILIST: AuthResponse | null;
+}
 export function useAuth() {
   const clientId = ref<string | number>(
     (process.client && localStorage.getItem("clientId")) || ""
@@ -19,11 +23,16 @@ export function useAuth() {
     (process.client && localStorage.getItem("redirectUri")) || ""
   );
   const code = ref<string | null>();
-  const tokenInfo = ref<AuthResponse>(
-    JSON.parse(
-      (process.client && localStorage.getItem("ani-code")) || `{}`
-    ) satisfies AuthResponse
-  );
+  const tokens = ref<TokenType>({
+    MAL:
+      (JSON.parse(
+        localStorage.getItem("token-mal") || "{}"
+      ) satisfies AuthResponse) || null,
+    ANILIST:
+      (JSON.parse(
+        localStorage.getItem("token-anilist") || "{}"
+      ) satisfies AuthResponse) || null,
+  });
   const isMalConnected = ref(
     !!(process.client && localStorage.getItem("isAuthMAL"))
   );
@@ -34,7 +43,6 @@ export function useAuth() {
   const codeVerifier = ref(
     (process.client && localStorage.getItem("PKCE_V")) || ""
   );
-  const loggedInProvider = new Array<"MAL" | "ANILIST">(2);
 
   function loginWithAniList(options: AuthOptions) {
     clientId.value = options.clientId;
@@ -97,29 +105,28 @@ export function useAuth() {
           ...((await data) as Object),
           issued_in: Date.now(),
         } as AuthResponse;
-
-        tokenInfo.value = newData;
-        localStorage.setItem("ani-token", JSON.stringify(tokenInfo.value));
+        tokens.value[authProvider.value] = newData;
+        authProvider.value === "ANILIST"
+          ? localStorage.setItem(
+              "token-anilist",
+              JSON.stringify(tokens.value[authProvider.value])
+            )
+          : localStorage.setItem(
+              "token-mal",
+              JSON.stringify(tokens.value[authProvider.value])
+            );
         window.history.pushState("home", "", window.location.origin);
 
         if (authProvider.value === "MAL") {
           isMalConnected.value = true;
-          localStorage.setItem("isAuthMAL", "true");
         } else {
           isAniListConnected.value = true;
-          localStorage.setItem("isAuthAL", "true");
-        }
-
-        if (!loggedInProvider.includes(authProvider.value)) {
-          loggedInProvider.push(authProvider.value);
         }
       } catch {
         if (authProvider.value === "MAL") {
           isMalConnected.value = false;
-          localStorage.removeItem("isAuthMAL");
         } else {
           isAniListConnected.value = false;
-          localStorage.removeItem("isAuthAL");
         }
       }
       // Clearing Client Info so it can be replced with other client
@@ -129,32 +136,62 @@ export function useAuth() {
       process.client && localStorage.removeItem("redirectUri");
       process.client && localStorage.removeItem("PKCE_V");
     }
-    if (tokenInfo.value?.access_token) {
-      if (localStorage.getItem("isAuthMAL")) isMalConnected.value = true;
-      if (localStorage.getItem("isAuthAL")) isAniListConnected.value = true;
-    }
+
+    // On Each Mount if tokens exists switch isconnected values
+    tokens.value.ANILIST?.access_token
+      ? (isAniListConnected.value = true)
+      : (isAniListConnected.value = false);
+    tokens.value.MAL?.access_token
+      ? (isMalConnected.value = true)
+      : (isMalConnected.value = false);
+
+    // FIXME: Fix Refresh Token Handling for each provider seprately
+    // For Handling Token Refreshing
     watchEffect(async () => {
       if (
-        tokenInfo.value &&
-        tokenInfo.value?.expires_in + tokenInfo.value?.issued_in < Date.now()
+        tokens.value.MAL &&
+        tokens.value.MAL?.expires_in + tokens.value.MAL?.issued_in < Date.now()
       ) {
-        for (const provider of loggedInProvider) {
-          const token = await useFetch("/api/auth/refresh", {
-            method: "POST",
-            body: { code: tokenInfo.value.refresh_token, provider },
-          });
-          const newData = {
-            ...(token.data.value as Object),
-            issued_in: Date.now(),
-          } as AuthResponse;
-          tokenInfo.value = newData;
-        }
+        const token = await useFetch("/api/auth/refresh", {
+          method: "POST",
+          body: { code: tokens.value.MAL?.refresh_token, provider: "MAL" },
+        });
+        const newData = {
+          ...(token.data.value as Object),
+          issued_in: Date.now(),
+        } as AuthResponse;
+        tokens.value.MAL = newData;
+      }
+      if (
+        tokens.value.ANILIST &&
+        tokens.value.ANILIST?.expires_in + tokens.value.ANILIST?.issued_in <
+          Date.now()
+      ) {
+        const token = await useFetch("/api/auth/refresh", {
+          method: "POST",
+          body: {
+            code: tokens.value.ANILIST?.refresh_token,
+            provider: "ANILIST",
+          },
+        });
+        const newData = {
+          ...(token.data.value as Object),
+          issued_in: Date.now(),
+        } as AuthResponse;
+        tokens.value.ANILIST = newData;
       }
     });
   });
-
+  function logout(provider: "MAL" | "ANILIST") {
+    if (provider === "MAL") {
+      localStorage.removeItem("token-mal");
+    } else {
+      localStorage.removeItem("token-anilist");
+    }
+  }
   return {
-    token: tokenInfo,
+    token: tokens.value,
+    logout,
     loginWithAniList,
     isMalConnected,
     isAniListConnected,

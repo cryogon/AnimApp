@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
-const { isAniListConnected, loginWithAniList, token } = useAuth();
+const { isAniListConnected, loginWithAniList } = useAuth();
 </script>
 
 <template>
@@ -18,6 +18,6 @@ const { isAniListConnected, loginWithAniList, token } = useAuth();
     >
       Connect
     </button>
-    <span v-else>{{ token }}</span>
+    <span v-else>connected</span>
   </div>
 </template>

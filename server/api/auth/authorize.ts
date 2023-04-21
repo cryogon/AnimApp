@@ -8,20 +8,21 @@ export default defineEventHandler(async (e) => {
   const req = util.promisify(request);
   try {
     if (body.provider === "MAL") {
+      const formData = {
+        grant_type: "authorization_code",
+        client_id: config.public.malClientId,
+        client_secret: config.malClientSecret,
+        redirect_uri: "http://localhost:3000/",
+        code_verifier: body.codeVerifier,
+        code: body.code,
+      };
       const data = await req({
         uri: "https://myanimelist.net/v1/oauth2/token",
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        formData: {
-          grant_type: "authorization_code",
-          client_id: config.public.malClientId,
-          client_secret: config.malClientSecret,
-          redirect_uri: "http://localhost:3000/",
-          code_verifier: body.code_verifier,
-          code: body.code,
-        },
+        formData,
       });
       return data.body;
     } else {
@@ -43,7 +44,6 @@ export default defineEventHandler(async (e) => {
       return data.body;
     }
   } catch (err) {
-    console.log(err);
     return { error: err };
   }
 });

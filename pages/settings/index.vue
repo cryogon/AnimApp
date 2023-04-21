@@ -19,9 +19,17 @@
     </section>
     <section class="other-options">
       <h3>Appearance</h3>
-      <div class="icon">
+      <div class="icon setting-option" @click="$router.push('/settings/theme')">
         <Icon name="mdi:theme-light-dark" size="35" />
         <span> Theme </span>
+      </div>
+      <div class="icon setting-option" @click="$router.push('/settings/user')">
+        <Icon name="mdi:account" size="35" />
+        <span> User </span>
+      </div>
+      <div class="icon setting-option" @click="$router.push('/settings/user')">
+        <Icon name="mdi:arrow-left" size="35" />
+        <span> Logout </span>
       </div>
     </section>
   </main>
@@ -33,6 +41,10 @@ main {
     display: inline-flex;
     align-items: center;
     gap: 10px;
+  }
+  .setting-option {
+    cursor: pointer;
+    display: flex;
   }
   .anime-providers {
     display: flex;
