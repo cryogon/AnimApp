@@ -12,6 +12,5 @@ export default defineEventHandler(async (e) => {
     }
   );
   const anime = await res.json();
-  console.log(body);
   return anime;
 });
