@@ -1,19 +1,22 @@
 <template>
   <main class="layout-main">
-    <slot />
+    <div class="content">
+      <slot />
+    </div>
     <footer>
       <NavBar class="nav" />
     </footer>
   </main>
 </template>
-<style scoped>
+<style scoped lang="scss">
 main.layout-main {
-  display: flex;
-  flex-direction: column;
-}
-.nav {
-  position: fixed;
-  bottom: 0;
-  z-index: 99999;
+  overflow-y: scroll;
+  .content {
+    height: 93vh;
+  }
+  .nav {
+    position: fixed;
+    bottom: 0;
+  }
 }
 </style>

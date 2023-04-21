@@ -91,6 +91,7 @@ onMounted(() => {
       placeholder="Search for anime"
       autocomplete="off"
       autosave="off"
+      @keypress.enter="$router.push(`/search/${search}`)"
     />
     <section v-if="seasonalAnime" class="seasonal_anime">
       <h2>Seasonal Anime</h2>
