@@ -6,6 +6,7 @@ const config = useRuntimeConfig();
 export default defineEventHandler(async (e) => {
   const body = await readBody(e);
   const req = util.promisify(request);
+
   try {
     if (body.provider === "MAL") {
       const formData = {

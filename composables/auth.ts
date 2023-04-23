@@ -26,19 +26,15 @@ export function useAuth() {
   const tokens = ref<TokenType>({
     MAL:
       (JSON.parse(
-        localStorage.getItem("token-mal") || "{}"
+        (process.client && localStorage.getItem("token-mal")) || "{}"
       ) satisfies AuthResponse) || null,
     ANILIST:
       (JSON.parse(
-        localStorage.getItem("token-anilist") || "{}"
+        (process.client && localStorage.getItem("token-anilist")) || "{}"
       ) satisfies AuthResponse) || null,
   });
-  const isMalConnected = ref(
-    !!(process.client && localStorage.getItem("isAuthMAL"))
-  );
-  const isAniListConnected = ref(
-    !!(process.client && localStorage.getItem("isAuthAL"))
-  );
+  const isMalConnected = ref(false);
+  const isAniListConnected = ref(false);
   const authProvider = ref<"MAL" | "ANILIST">("ANILIST");
   const codeVerifier = ref(
     (process.client && localStorage.getItem("PKCE_V")) || ""
@@ -60,8 +56,8 @@ export function useAuth() {
   function loginWithMAL(options: AuthOptions) {
     codeVerifier.value = getCodeVerifier(128);
     process.client && localStorage.setItem("PKCE_V", codeVerifier.value);
-    clientId.value ||= options.clientId;
-    redirectUri.value ||= options.redirectUri;
+    clientId.value = options.clientId;
+    redirectUri.value = options.redirectUri;
 
     process.client &&
       localStorage.setItem("clientId", clientId.value.toString());
@@ -107,14 +103,12 @@ export function useAuth() {
         } as AuthResponse;
         tokens.value[authProvider.value] = newData;
         authProvider.value === "ANILIST"
-          ? localStorage.setItem(
-              "token-anilist",
-              JSON.stringify(tokens.value[authProvider.value])
-            )
-          : localStorage.setItem(
-              "token-mal",
-              JSON.stringify(tokens.value[authProvider.value])
-            );
+          ? localStorage.setItem("token-anilist", JSON.stringify(newData))
+          : localStorage.setItem("token-mal", JSON.stringify(newData));
+        process.client && localStorage.removeItem("clientId");
+        process.client && localStorage.removeItem("redirectUri");
+        process.client && localStorage.removeItem("PKCE_V");
+
         window.history.pushState("home", "", window.location.origin);
 
         if (authProvider.value === "MAL") {
@@ -132,12 +126,10 @@ export function useAuth() {
       // Clearing Client Info so it can be replced with other client
       // Nitro Server Gives error since it cannot find localStorage in node environment
       // So need to check if it is being used by client not server;
-      process.client && localStorage.removeItem("clientId");
-      process.client && localStorage.removeItem("redirectUri");
-      process.client && localStorage.removeItem("PKCE_V");
     }
 
     // On Each Mount if tokens exists switch isconnected values
+    console.log(tokens.value.MAL);
     tokens.value.ANILIST?.access_token
       ? (isAniListConnected.value = true)
       : (isAniListConnected.value = false);
@@ -149,7 +141,7 @@ export function useAuth() {
     // For Handling Token Refreshing
     watchEffect(async () => {
       if (
-        tokens.value.MAL &&
+        tokens.value.MAL?.access_token &&
         tokens.value.MAL?.expires_in + tokens.value.MAL?.issued_in < Date.now()
       ) {
         const token = await useFetch("/api/auth/refresh", {
@@ -161,9 +153,10 @@ export function useAuth() {
           issued_in: Date.now(),
         } as AuthResponse;
         tokens.value.MAL = newData;
+        localStorage.setItem("token-mal", JSON.stringify(newData));
       }
       if (
-        tokens.value.ANILIST &&
+        tokens.value.ANILIST?.access_token &&
         tokens.value.ANILIST?.expires_in + tokens.value.ANILIST?.issued_in <
           Date.now()
       ) {
@@ -179,14 +172,21 @@ export function useAuth() {
           issued_in: Date.now(),
         } as AuthResponse;
         tokens.value.ANILIST = newData;
+        localStorage.setItem("token-anilist", JSON.stringify(newData));
       }
     });
   });
   function logout(provider: "MAL" | "ANILIST") {
-    if (provider === "MAL") {
-      localStorage.removeItem("token-mal");
-    } else {
-      localStorage.removeItem("token-anilist");
+    if (process.client) {
+      if (provider === "MAL") {
+        localStorage.removeItem("token-mal");
+        tokens.value.MAL = null;
+        isMalConnected.value = false;
+      } else {
+        localStorage.removeItem("token-anilist");
+        tokens.value.ANILIST = null;
+        isAniListConnected.value = false;
+      }
     }
   }
   return {
