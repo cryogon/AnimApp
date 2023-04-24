@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
-const { isAniListConnected, loginWithAniList, logout } = useAuth();
+const { isAniListConnected, loginWithAniList } = useAuth();
 </script>
 
 <template>
@@ -18,6 +18,6 @@ const { isAniListConnected, loginWithAniList, logout } = useAuth();
     >
       Connect
     </button>
-    <button v-else type="button" @click="logout('ANILIST')">Disconnect</button>
+    <span v-else>connected</span>
   </div>
 </template>

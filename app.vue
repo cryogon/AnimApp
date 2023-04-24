@@ -1,7 +1,6 @@
 <script setup lang="ts">
 useHead({
   htmlAttrs: {
-    lang: "en",
     class: ["forest-green"],
   },
 });

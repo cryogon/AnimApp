@@ -8,11 +8,6 @@ export default defineNuxtConfig({
       aniListClientId: process.env.NUXT_ANILIST_CLIENT_ID,
     },
   },
-  router: {
-    options: {
-      strict: false,
-    },
-  },
   modules: ["nuxt-icon", "@nuxtjs/eslint-module"],
   css: ["~/css/main.css"],
 });

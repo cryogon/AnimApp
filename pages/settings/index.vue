@@ -27,6 +27,10 @@
         <Icon name="mdi:account" size="35" />
         <span> User </span>
       </div>
+      <div class="icon setting-option" @click="$router.push('/settings/user')">
+        <Icon name="mdi:arrow-left" size="35" />
+        <span> Logout </span>
+      </div>
     </section>
   </main>
 </template>
