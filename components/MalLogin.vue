@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
-const { loginWithMAL, isMalConnected } = useAuth();
+const { loginWithMAL, isMalConnected, logout } = useAuth();
 function login() {
   loginWithMAL({
     clientId: config.public.malClientId,
@@ -11,6 +11,6 @@ function login() {
 <template>
   <div>
     <button v-if="!isMalConnected" type="button" @click="login">Connect</button>
-    <span>connected</span>
+    <button v-else type="button" @click="logout('MAL')">Disconnect</button>
   </div>
 </template>
